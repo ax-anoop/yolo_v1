@@ -15,9 +15,10 @@ import time
 
 from legacy import loss as legacy_loss 
 from legacy import utils as legacy_utils
+from data.datasets import voc
 
 LR = 2e-5 # learning rate
-BATCH = 8 # 64 in original paper but I don't have that much vram, grad accum?
+BATCH = 4 # 64 in original paper but I don't have that much vram, grad accum?
 WD = 0 # weight decay
 WORKERS = 10 # number of workers for dataloader
 EPOCHS = 1000 # number of epochs to train for
@@ -27,10 +28,10 @@ print("USING:",DEVICE)
 def get_data(trainval=0.995):
     train_set = dataset_creator.VOC("/home/server/Desktop/pascal_voc", train=True) # Random split
     valid_set = dataset_creator.VOC("/home/server/Desktop/pascal_voc", train=False) # Random split
-    # train_set_size = int(len(train_set) * trainval)
-    # valid_set_size = len(train_set) - train_set_size
-    # train_set, valid_set = data.random_split(train_set, [train_set_size, valid_set_size])
-    train_loader = DataLoader(train_set, batch_size=BATCH, shuffle=True, num_workers=WORKERS, drop_last=True)
+
+    train_root = "/home/server/Desktop/pascal_voc/"
+    train_loader = voc.VOCDatasets(train_root)
+    # train_loader = DataLoader(train_set, batch_size=BATCH, shuffle=True, num_workers=WORKERS, drop_last=True)
     val_loader = DataLoader(valid_set, batch_size=BATCH, shuffle=True, num_workers=WORKERS, drop_last=True)
     return train_loader, val_loader
 
@@ -105,7 +106,7 @@ def main():
     check_pt_name = "my_checkpoint.pth.tar"
     load_model = False
     
-    model = model_creator.create(backbone="vgg16")
+    model = model_creator.create(backbone="resnet152")
     if load_model:
         utils.load(model,filename=check_pt_name)
     optimizer = optim.Adam(model.parameters(), lr=LR, weight_decay=WD)

@@ -3,6 +3,8 @@ import PIL
 import torchvision.transforms as T
 import numpy as np
 import torch 
+import numpy as np 
+from PIL import Image
 
 class Viz:
     def __init__(self, classes=None):
@@ -57,13 +59,13 @@ class Viz:
                 boxes.append([classes, mid_x, mid_y, width, height])
         return boxes
 
-    def show_image(self, img, format=None, boxes=None):
+    def show_image(self, img, format=None, boxes=None,saveimg=False):
         '''
         Show image with bounding boxes prvided the box has 
             > [[class, mid_x, mid_y, width, height] .. ]
         '''
-        if type(img) == PIL.JpegImagePlugin.JpegImageFile:
-            img = img
+        if type(img) == np.ndarray:
+            img = Image.fromarray(img)
         elif type(img) == torch.Tensor:
             img = T.ToPILImage()(img)
         else:
@@ -80,4 +82,7 @@ class Viz:
                 boxes = self._parse_yolo(boxes)
                 for box in boxes:
                     img = self._draw_box(img, box, "midpoints", center=True)
-        img.show()
+        if saveimg:
+            img.save("tmp.jpg")
+        else:
+            img.show()

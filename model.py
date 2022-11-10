@@ -58,6 +58,9 @@ class Yolov1(nn.Module):
         self.flatten = nn.Flatten()
         if backbone == "darknet":
             self.backbone = self._create_from_arch(darknet_arch, 3)
+        elif backbone == "resnet152":
+            # ResNet152_Weights.IMAGENET1K_V2
+            self.backbone = nn.Sequential(*list(torchvision.models.resnet152(weights="IMAGENET1K_V2").children())[:-2])
         elif backbone == "resnet50": 
             self.backbone = nn.Sequential(*list(torchvision.models.resnet50(weights="IMAGENET1K_V1").children())[:-2])
         elif backbone == "resnet34": 

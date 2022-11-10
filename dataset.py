@@ -43,6 +43,7 @@ class VOC(torch.utils.data.Dataset):
             line = line.split()
             box = list(map(float, line))
             boxes.append(box)
+            
         boxes = torch.tensor(boxes)
         if self.train:
             for aug in self.augmentations:
